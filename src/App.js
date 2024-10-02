@@ -31,6 +31,9 @@ function App() {
   const [searchType, setSearchType] = useState('random'); // 검색 타입 상태 (random, latest, genre)
   const [selectedGenre, setSelectedGenre] = useState(null); // 선택된 장르 상태
 
+  // API URL을 환경 변수에서 가져옴
+  const API_URL = process.env.REACT_APP_API_URL;
+
   // 영화 목록을 가져오는 함수
   const fetchMovies = async (movieCount = '') => {
     try {
@@ -38,11 +41,11 @@ function App() {
       let apiEndpoint = '';
 
       if (searchType === 'random') {
-        apiEndpoint = `http://localhost:8002/random/${movieCount}`;
+        apiEndpoint = `${API_URL}/random/${movieCount}`;
       } else if (searchType === 'latest') {
-        apiEndpoint = `http://localhost:8002/latest/${movieCount}`;
+        apiEndpoint = `${API_URL}/latest/${movieCount}`;
       } else if (searchType === 'genre' && selectedGenre) {
-        apiEndpoint = `http://localhost:8002/genres/${selectedGenre}/${movieCount}`;
+        apiEndpoint = `${API_URL}/genres/${selectedGenre}/${movieCount}`;
       }
 
       const response = await fetch(apiEndpoint);
