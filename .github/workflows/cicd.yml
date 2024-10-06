@@ -1,0 +1,44 @@
+name: React CICD
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시할 때 CI/CD 실행
+
+jobs:
+  build:
+    runs-on: linode
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4 # 소스 코드를 체크아웃
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "${{ secrets.REACT_APP_API_URL }}" > .env
+
+      - name: Sign in to Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin # Docker Hub에 로그인
+
+      - name: Build Docker Image
+        run: docker build -t koobonse/movie-front:latest . # React 애플리케이션 빌드
+
+      - name: Push Docker Image
+        run: docker push koobonse/movie-front:latest # Docker Hub에 빌드된 이미지를 푸시
+
+  deploy:
+    needs: build
+    runs-on: linode
+
+    steps:
+      - name: Sign in to Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin # 배포 서버에서 Docker Hub에 로그인
+
+      - name: Pull image from Docker Hub
+        run: docker pull koobonse/movie-front:latest # 최신 이미지 가져오기
+
+      - name: Delete existing container
+        run: docker rm -f movie || true # 기존 컨테이너 삭제 (없을 경우 무시)
+
+      - name: Run container on port 3003
+        run: docker run -d -p 3003:80 --name movie koobonse/movie-front:latest # 포트 3002에서 실행
