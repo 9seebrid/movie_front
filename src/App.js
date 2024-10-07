@@ -23,54 +23,47 @@ const genresList = [
 ];
 
 function App() {
-  const [movies, setMovies] = useState([]); // 영화 목록 상태
-  const [selectedMovie, setSelectedMovie] = useState(null); // 선택된 영화 상태
-  const [error, setError] = useState(null); // 에러 상태
-  const [loading, setLoading] = useState(false); // 로딩 상태
-  const [count, setCount] = useState(''); // 영화 개수 상태
-  const [searchType, setSearchType] = useState('random'); // 검색 타입 상태 (random, latest, genre)
-  const [selectedGenre, setSelectedGenre] = useState(null); // 선택된 장르 상태
-  const [language, setLanguage] = useState('eng'); // 언어 상태 (영어: eng, 한글: kor)
+  const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState('');
+  const [searchType, setSearchType] = useState('random');
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [language, setLanguage] = useState('eng'); // 전체 페이지 언어
+  const [showTrailer, setShowTrailer] = useState(false);
 
-  // API URL을 환경 변수에서 가져옴
   const API_URL = process.env.REACT_APP_API_URL;
 
-  // 영화 목록을 가져오는 함수
   const fetchMovies = async (movieCount = '') => {
     try {
       setLoading(true);
       let apiEndpoint = '';
-
-      if (searchType === 'random') {
-        apiEndpoint = `${API_URL}/random/${movieCount}`;
-      } else if (searchType === 'latest') {
-        apiEndpoint = `${API_URL}/latest/${movieCount}`;
-      } else if (searchType === 'genre' && selectedGenre) {
+      if (searchType === 'random') apiEndpoint = `${API_URL}/random/${movieCount}`;
+      else if (searchType === 'latest') apiEndpoint = `${API_URL}/latest/${movieCount}`;
+      else if (searchType === 'genre' && selectedGenre)
         apiEndpoint = `${API_URL}/genres/${selectedGenre}/${movieCount}`;
-      }
 
       const response = await fetch(apiEndpoint);
       const data = await response.json();
-      setMovies(data); // 영화 목록 상태 업데이트
-      setError(null); // 에러 초기화
+      setMovies(data);
+      setError(null);
     } catch (err) {
       setError('영화 정보를 불러오지 못했습니다.');
     } finally {
-      setLoading(false); // 로딩 상태 해제
+      setLoading(false);
     }
   };
 
-  // 영화 목록에서 영화를 클릭했을 때 상세 정보 표시
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
   };
 
-  // 영화 상세 정보 닫기
   const handleCloseDetail = () => {
     setSelectedMovie(null);
+    setShowTrailer(false); // 트레일러 팝업 상태 초기화
   };
 
-  // 언어 선택 변경 함수
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
   };
@@ -78,9 +71,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🎬 영화 목록 🎬</h1>
+        <h1>{language === 'eng' ? '🎬 Movie Search 🎬' : '🎬 영화 검색 🎬'}</h1>
 
-        {/* 영화 검색 옵션 */}
+        {/* 검색 옵션 버튼 */}
         <div className="search-options">
           <button
             onClick={() => {
@@ -89,7 +82,7 @@ function App() {
             }}
             className={searchType === 'random' ? 'active' : ''}
           >
-            랜덤 영화
+            {language === 'eng' ? 'Random Movies' : '랜덤 영화'}
           </button>
           <button
             onClick={() => {
@@ -98,10 +91,10 @@ function App() {
             }}
             className={searchType === 'latest' ? 'active' : ''}
           >
-            최신 영화
+            {language === 'eng' ? 'Latest Movies' : '최신 영화'}
           </button>
           <button onClick={() => setSearchType('genre')} className={searchType === 'genre' ? 'active' : ''}>
-            장르별 영화
+            {language === 'eng' ? 'Genres Movies' : '장르별 영화'}
           </button>
         </div>
 
@@ -125,88 +118,175 @@ function App() {
             type="number"
             value={count}
             onChange={(e) => setCount(e.target.value)}
-            placeholder="영화 개수를 입력하세요"
+            placeholder={language === 'eng' ? 'Enter number of movies' : '영화 개수를 입력하세요'}
             className="movie-count-input"
             min={1}
-          />{' '}
+          />
           <button onClick={() => fetchMovies(count)} className="search-button">
-            검색
+            {language === 'eng' ? 'Search' : '검색'}
           </button>
         </div>
 
-        {/* 언어 선택 버튼 */}
+        {/* 전체 언어 선택 버튼 */}
         <div className="language-toggle">
-          <button onClick={() => setLanguage('eng')} className={language === 'eng' ? 'active' : ''}>
+          <button onClick={() => handleLanguageChange('eng')} className={language === 'eng' ? 'active' : ''}>
             {language === 'eng' ? 'English' : '영어'}
           </button>
-          <button onClick={() => setLanguage('kor')} className={language === 'kor' ? 'active' : ''}>
-            {language === 'eng' ? 'Korean' : '한글'}
+          <button onClick={() => handleLanguageChange('kor')} className={language === 'kor' ? 'active' : ''}>
+            {language === 'kor' ? '한글' : 'Korean'}
           </button>
         </div>
 
         {loading ? (
-          <p>로딩 중...</p>
+          <p>{language === 'eng' ? 'Loading...' : '로딩 중...'}</p>
         ) : error ? (
           <p>{error}</p>
         ) : (
           <div className="movie-list">
-            {/* 영화 목록이 없을 때 보여줄 메시지 */}
-            {movies.length === 0 && <p>영화를 검색해 주세요.</p>}
-
-            {/* 영화 목록이 있을 때는 영화 카드들을 보여줌 */}
-            {movies.length > 0 &&
-              movies.map((movie) => (
-                <div key={movie.movieId} className="movie-item" onClick={() => handleMovieClick(movie)}>
-                  <img
-                    src={language === 'eng' ? movie.poster_path_eng : movie.poster_path_kor}
-                    alt={language === 'eng' ? movie.title_eng : movie.title_kor}
-                    className="movie-thumbnail"
-                  />
-                  <h3 className="movie-title">{language === 'eng' ? movie.title_eng : movie.title_kor}</h3>
-                  <p className="movie-genre">{language === 'eng' ? movie.genres_eng : movie.genres_kor}</p>
-                </div>
-              ))}
+            {movies.length === 0 && <p>{language === 'eng' ? 'Please search for movies.' : '영화를 검색해 주세요.'}</p>}
+            {movies.map((movie) => (
+              <div key={movie.movieId} className="movie-item" onClick={() => handleMovieClick(movie)}>
+                <img
+                  src={language === 'eng' ? movie.poster_path_eng : movie.poster_path_kor}
+                  alt={language === 'eng' ? movie.title_eng : movie.title_kor}
+                  className="movie-thumbnail"
+                />
+                <h3 className="movie-title">{language === 'eng' ? movie.title_eng : movie.title_kor}</h3>
+                <p className="movie-genre">{language === 'eng' ? movie.genres_eng : movie.genres_kor}</p>
+                <p className="movie-year">{language === 'eng' ? movie.year_eng : movie.year_kor}</p>
+              </div>
+            ))}
           </div>
         )}
 
+        {/* 상세 페이지 */}
         {selectedMovie && (
-          <div className="movie-detail-overlay" onClick={handleCloseDetail}>
-            <div className="movie-detail" onClick={(e) => e.stopPropagation()}>
-              <img
-                src={language === 'eng' ? selectedMovie.poster_path_eng : selectedMovie.poster_path_kor}
-                alt={language === 'eng' ? selectedMovie.title_eng : selectedMovie.title_kor}
-                className="movie-poster"
-              />
-              <h2>{language === 'eng' ? selectedMovie.title_eng : selectedMovie.title_kor}</h2>
-              <p>
-                {language === 'eng' ? 'Genre' : '장르'}:{' '}
-                {language === 'eng' ? selectedMovie.genres_eng : selectedMovie.genres_kor}
-              </p>
-              <p>
-                {language === 'eng' ? 'Movie Info Link' : '영화 정보 링크'}:{' '}
-                <a
-                  href={language === 'eng' ? selectedMovie.tmdburl_eng : selectedMovie.tmdburl_kor}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {language === 'eng' ? selectedMovie.tmdburl_eng : selectedMovie.tmdburl_kor}
-                </a>
-              </p>
-              <p>
-                {language === 'eng' ? 'Average Rating' : '평균 평점'}:{' '}
-                {language === 'eng' ? selectedMovie.rating_avg_eng : selectedMovie.rating_avg_kor}
-              </p>
-              <p>
-                {language === 'eng' ? 'Rating Count' : '평점 수'}:{' '}
-                {language === 'eng' ? selectedMovie.rating_count_eng : selectedMovie.rating_count_kor}
-              </p>
-              <button onClick={handleCloseDetail} className="close-detail-button">
-                {language === 'eng' ? 'Close' : '닫기'}
+          <MovieDetail
+            movie={selectedMovie}
+            defaultLanguage={language} // 기본 언어 전달
+            onClose={handleCloseDetail}
+            showTrailer={showTrailer}
+            setShowTrailer={setShowTrailer}
+          />
+        )}
+      </header>
+    </div>
+  );
+}
+
+function MovieDetail({ movie, defaultLanguage, onClose, showTrailer, setShowTrailer }) {
+  const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage); // 상세 페이지의 독립적인 언어 상태
+  const [showFullInfo, setShowFullInfo] = useState(false); // 상세 페이지 내부의 showFullInfo 상태
+
+  // 트레일러 URL을 공통으로 정의
+  const trailerURL = movie.trailer_url_eng || movie.trailer_url_kor;
+
+  return (
+    <div className="movie-detail-overlay" onClick={onClose}>
+      <div className="movie-detail" onClick={(e) => e.stopPropagation()}>
+        <div className="movie-detail-header">
+          <h2>
+            {selectedLanguage === 'eng' ? movie.title_eng : movie.title_kor} -
+            {selectedLanguage === 'eng' ? movie.year_eng : movie.year_kor}
+          </h2>
+
+          {/* 언어 선택 버튼 (상세 페이지 내) */}
+          <div className="detail-language-toggle">
+            <button onClick={() => setSelectedLanguage('eng')} className={selectedLanguage === 'eng' ? 'active' : ''}>
+              {selectedLanguage === 'eng' ? 'English' : '영어'}
+            </button>
+            <button onClick={() => setSelectedLanguage('kor')} className={selectedLanguage === 'kor' ? 'active' : ''}>
+              {selectedLanguage === 'kor' ? '한글' : 'Korean'}
+            </button>
+          </div>
+        </div>
+
+        <div className="movie-detail-content">
+          <img
+            src={selectedLanguage === 'eng' ? movie.poster_path_eng : movie.poster_path_kor}
+            alt={selectedLanguage === 'eng' ? movie.title_eng : movie.title_kor}
+            className="movie-poster-large"
+          />
+          <div className="movie-info">
+            <p>
+              {selectedLanguage === 'eng' ? 'Genre' : '장르'}:{' '}
+              {selectedLanguage === 'eng' ? movie.genres_eng : movie.genres_kor}
+            </p>
+            <p className={`detail-sub ${showFullInfo ? 'expanded' : 'collapsed'}`}>
+              {selectedLanguage === 'eng' ? movie.info_eng : movie.info_kor}
+            </p>
+
+            {/* 더보기 버튼 */}
+            {(selectedLanguage === 'eng' && movie.info_eng.length > 200) ||
+            (selectedLanguage === 'kor' && movie.info_kor.length > 200) ? (
+              <button onClick={() => setShowFullInfo(!showFullInfo)} className="toggle-info-button">
+                {showFullInfo
+                  ? selectedLanguage === 'eng'
+                    ? 'Show Less'
+                    : '간략히 보기'
+                  : selectedLanguage === 'eng'
+                  ? 'Show More'
+                  : '더보기'}
               </button>
+            ) : null}
+
+            <p>
+              {selectedLanguage === 'eng' ? 'Movie Info Link' : '영화 정보 링크'}:
+              <a
+                href={selectedLanguage === 'eng' ? movie.tmdburl_eng : movie.tmdburl_kor}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="info-link-button"
+              >
+                {selectedLanguage === 'eng' ? 'Go to Info' : '이동하기'}
+              </a>
+            </p>
+
+            {/* 트레일러 버튼: 트레일러 URL이 있을 때만 표시 */}
+            {trailerURL && (
+              <p>
+                {selectedLanguage === 'eng' ? 'Trailer' : '트레일러'}:
+                <button onClick={() => setShowTrailer(true)} className="trailer-button">
+                  {selectedLanguage === 'eng' ? 'Watch Trailer' : '트레일러 보기'}
+                </button>
+              </p>
+            )}
+
+            <p>
+              {selectedLanguage === 'eng' ? 'Average Rating' : '평균 평점'}:{' '}
+              {selectedLanguage === 'eng' ? movie.rating_avg_eng : movie.rating_avg_kor}
+            </p>
+            <p>
+              {selectedLanguage === 'eng' ? 'Rating Count' : '평점 수'}:{' '}
+              {selectedLanguage === 'eng'
+                ? Number(movie.rating_count_eng).toLocaleString()
+                : Number(movie.rating_count_kor).toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <button onClick={onClose} className="close-detail-button">
+          {selectedLanguage === 'eng' ? 'Close' : '닫기'}
+        </button>
+
+        {showTrailer && (
+          <div className="trailer-overlay" onClick={() => setShowTrailer(false)}>
+            <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setShowTrailer(false)} className="close-trailer-button">
+                X
+              </button>
+              <iframe
+                width="560"
+                height="315"
+                src={trailerURL.replace('watch?v=', 'embed/')}
+                title="YouTube video player"
+                frameBorder="0"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         )}
-      </header>
+      </div>
     </div>
   );
 }
