@@ -30,6 +30,7 @@ function App() {
   const [count, setCount] = useState(''); // 영화 개수 상태
   const [searchType, setSearchType] = useState('random'); // 검색 타입 상태 (random, latest, genre)
   const [selectedGenre, setSelectedGenre] = useState(null); // 선택된 장르 상태
+  const [language, setLanguage] = useState('eng'); // 언어 상태 (영어: eng, 한글: kor)
 
   // API URL을 환경 변수에서 가져옴
   const API_URL = process.env.REACT_APP_API_URL;
@@ -67,6 +68,11 @@ function App() {
   // 영화 상세 정보 닫기
   const handleCloseDetail = () => {
     setSelectedMovie(null);
+  };
+
+  // 언어 선택 변경 함수
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
   };
 
   return (
@@ -128,6 +134,16 @@ function App() {
           </button>
         </div>
 
+        {/* 언어 선택 버튼 */}
+        <div className="language-toggle">
+          <button onClick={() => setLanguage('eng')} className={language === 'eng' ? 'active' : ''}>
+            영어
+          </button>
+          <button onClick={() => setLanguage('kor')} className={language === 'kor' ? 'active' : ''}>
+            한글
+          </button>
+        </div>
+
         {loading ? (
           <p>로딩 중...</p>
         ) : error ? (
@@ -141,9 +157,13 @@ function App() {
             {movies.length > 0 &&
               movies.map((movie) => (
                 <div key={movie.movieId} className="movie-item" onClick={() => handleMovieClick(movie)}>
-                  <img src={movie.poster_path} alt={movie.title} className="movie-thumbnail" />
-                  <h3 className="movie-title">{movie.title}</h3>
-                  <p className="movie-genre">{movie.genres}</p>
+                  <img
+                    src={language === 'eng' ? movie.poster_path_eng : movie.poster_path_kor}
+                    alt={language === 'eng' ? movie.title_eng : movie.title_kor}
+                    className="movie-thumbnail"
+                  />
+                  <h3 className="movie-title">{language === 'eng' ? movie.title_eng : movie.title_kor}</h3>
+                  <p className="movie-genre">{language === 'eng' ? movie.genres_eng : movie.genres_kor}</p>
                 </div>
               ))}
           </div>
@@ -152,19 +172,36 @@ function App() {
         {selectedMovie && (
           <div className="movie-detail-overlay" onClick={handleCloseDetail}>
             <div className="movie-detail" onClick={(e) => e.stopPropagation()}>
-              <img src={selectedMovie.poster_path} alt={selectedMovie.title} className="movie-poster" />
-              <h2>{selectedMovie.title}</h2>
-              <p>장르: {selectedMovie.genres}</p>
+              <img
+                src={language === 'eng' ? selectedMovie.poster_path_eng : selectedMovie.poster_path_kor}
+                alt={language === 'eng' ? selectedMovie.title_eng : selectedMovie.title_kor}
+                className="movie-poster"
+              />
+              <h2>{language === 'eng' ? selectedMovie.title_eng : selectedMovie.title_kor}</h2>
               <p>
-                영화 정보 링크:{' '}
-                <a href={selectedMovie.url} target="_blank" rel="noopener noreferrer">
-                  {selectedMovie.url}
+                {language === 'eng' ? 'Genre' : '장르'}:{' '}
+                {language === 'eng' ? selectedMovie.genres_eng : selectedMovie.genres_kor}
+              </p>
+              <p>
+                {language === 'eng' ? 'Movie Info Link' : '영화 정보 링크'}:{' '}
+                <a
+                  href={language === 'eng' ? selectedMovie.tmdburl_eng : selectedMovie.tmdburl_kor}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {language === 'eng' ? selectedMovie.tmdburl_eng : selectedMovie.tmdburl_kor}
                 </a>
               </p>
-              <p>평균 평점: {selectedMovie.rating_avg}</p>
-              <p>평점 수: {selectedMovie.rating_count}</p>
+              <p>
+                {language === 'eng' ? 'Average Rating' : '평균 평점'}:{' '}
+                {language === 'eng' ? selectedMovie.rating_avg_eng : selectedMovie.rating_avg_kor}
+              </p>
+              <p>
+                {language === 'eng' ? 'Rating Count' : '평점 수'}:{' '}
+                {language === 'eng' ? selectedMovie.rating_count_eng : selectedMovie.rating_count_kor}
+              </p>
               <button onClick={handleCloseDetail} className="close-detail-button">
-                닫기
+                {language === 'eng' ? 'Close' : '닫기'}
               </button>
             </div>
           </div>
