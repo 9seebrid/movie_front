@@ -137,10 +137,10 @@ function App() {
         {/* 언어 선택 버튼 */}
         <div className="language-toggle">
           <button onClick={() => setLanguage('eng')} className={language === 'eng' ? 'active' : ''}>
-            영어
+            {language === 'eng' ? 'English' : '영어'}
           </button>
           <button onClick={() => setLanguage('kor')} className={language === 'kor' ? 'active' : ''}>
-            한글
+            {language === 'eng' ? 'Korean' : '한글'}
           </button>
         </div>
 
