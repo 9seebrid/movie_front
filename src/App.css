@@ -227,21 +227,23 @@ h1 {
   line-height: 1.5;
   color: #555;
   max-width: 95%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* 영화 정보 이동 버튼 */
 .info-link-button {
-  padding: 8px;
+  display: inline-block;
+  padding: 8px 16px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   text-decoration: none;
-  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap; /* 줄바꿈 방지 */
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-left: 10px;
-  
 }
 
 .info-link-button:hover {
@@ -328,17 +330,15 @@ h1 {
 
 /* 트레일러 버튼 스타일 */
 .trailer-button {
-  padding: 8px;
+  display: inline-block;
+  padding: 8px 16px;
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  white-space: nowrap; /* 줄바꿈 방지 */
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-  margin-left: 10px;
-  font-weight: bold;
 }
 
 .trailer-button:hover {
