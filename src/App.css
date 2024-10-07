@@ -9,6 +9,14 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
+.no-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+
 .App-header {
   margin: 20px 0;
 }
@@ -85,6 +93,7 @@ h1 {
   margin-bottom: 40px;
   max-width: 1000px;
   margin: 0 auto;
+  margin-bottom: 20px
 }
 
 .genre-list button {

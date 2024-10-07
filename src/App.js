@@ -230,7 +230,7 @@ function MovieDetail({ movie, defaultLanguage, onClose, showTrailer, setShowTrai
               </button>
             ) : null}
 
-            <p>
+            <p className="no-wrap">
               {selectedLanguage === 'eng' ? 'Movie Info Link' : '영화 정보 링크'}:
               <a
                 href={selectedLanguage === 'eng' ? movie.tmdburl_eng : movie.tmdburl_kor}
