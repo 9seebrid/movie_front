@@ -156,7 +156,7 @@ function App() {
               <h2>{selectedMovie.title}</h2>
               <p>장르: {selectedMovie.genres}</p>
               <p>
-                IMDB 링크:{' '}
+                영화 정보 링크:{' '}
                 <a href={selectedMovie.url} target="_blank" rel="noopener noreferrer">
                   {selectedMovie.url}
                 </a>
