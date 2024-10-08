@@ -29,7 +29,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [count, setCount] = useState('');
   const [searchType, setSearchType] = useState('random');
-  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [selectedGenre, setSelectedGenre] = useState('Action');
   const [language, setLanguage] = useState('eng'); // 전체 페이지 언어
   const [showTrailer, setShowTrailer] = useState(false);
 
