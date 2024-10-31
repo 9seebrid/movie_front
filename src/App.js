@@ -118,7 +118,7 @@ function App() {
             type="number"
             value={count}
             onChange={(e) => setCount(e.target.value)}
-            placeholder={language === 'eng' ? 'Enter number of movies' : '영화 개수를 입력하세요'}
+            placeholder={language === 'eng' ? 'Enter number of movies' : '영화 개수를 입력하세요!!'}
             className="movie-count-input"
             min={1}
           />
